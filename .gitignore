@@ -1,0 +1,15 @@
+# IDE
+.idea
+
+# Project
+data/*.txt
+
+# Python
+.venv
+
+# C++
+cmake-build-*
+
+# Rust
+Cargo.lock
+target

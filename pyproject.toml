@@ -1,0 +1,18 @@
+[project]
+name = "billion-record-challenge"
+version = "0.0.1"
+requires-python = ">= 3.10"
+dependencies = [
+    "pre-commit",
+    "click"
+]
+
+[tool.isort]
+profile = "black"
+force_single_line = "true"
+
+[tool.mypy]
+show_error_codes = true
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true

@@ -1,0 +1,11 @@
+[package]
+name = "billion-record-challenge"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.4", features = ["derive"] }
+
+[[bin]]
+name = "billion-record-challenge"
+path = "src/rust/billion-record-challenge.rs"

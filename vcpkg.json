@@ -1,0 +1,9 @@
+{
+    "name": "billion-record-challenge",
+    "version-string": "0.0.1",
+    "dependencies": [
+        {
+            "name": "cxxopts"
+        }
+    ]
+}

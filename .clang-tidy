@@ -34,28 +34,3 @@ WarningsAsErrors: '*'
 AnalyzeTemporaryDtors: false
 
 FormatStyle: file
-
-CheckOptions:
-  - { key: readability-identifier-naming.NamespaceCase,                 value: lower_case }
-  - { key: readability-identifier-naming.ClassCase,                     value: lower_case }
-  - { key: readability-identifier-naming.StructCase,                    value: lower_case }
-  - { key: readability-identifier-naming.EnumCase,                      value: lower_case }
-  - { key: readability-identifier-naming.FunctionCase,                  value: lower_case }
-  - { key: readability-identifier-naming.TypedefCase,                   value: lower_case }
-  - { key: readability-identifier-naming.TypeAliasCase,                 value: lower_case }
-  - { key: readability-identifier-naming.TemplateParameterCase,         value: CamelCase }
-  - { key: readability-identifier-naming.ValueTemplateParameterCase,    value: CamelCase }
-  - { key: readability-identifier-naming.ParameterCase,                 value: lower_case }
-  - { key: readability-identifier-naming.VariableCase,                  value: lower_case }
-  - { key: readability-identifier-naming.StaticVariableCase,            value: lower_case }
-  - { key: readability-identifier-naming.PrivateMemberCase,             value: lower_case }
-  - { key: readability-identifier-naming.PrivateMemberPrefix,           value: '_' }
-  - { key: readability-identifier-naming.ProtectedMemberCase,           value: lower_case }
-  - { key: readability-identifier-naming.ProtectedMemberPrefix,         value: '_' }
-  - { key: readability-identifier-naming.ConstantMemberCase,            value: lower_case }
-  - { key: readability-identifier-naming.ConstantMemberPrefix,          value: '_' }
-  - { key: readability-identifier-naming.StaticConstantCase,            value: CamelCase }
-  - { key: readability-identifier-naming.GlobalConstantCase,            value: UPPER_CASE }
-  - { key: readability-identifier-naming.EnumConstantCase,              value: lower_case }
-
-...

@@ -21,26 +21,30 @@ I will try to add grids with progress improvements for each language.
 ---
 
 
-### Python
-| Approach | Time      | Delta | Notes |
-|----------|-----------|-------|-------|
-| Naive    | 17:23.284 | 0     |       |
-
+### Python (3.11, Cython)
+| Approach | Time      | Delta      | Notes                                                   |
+|----------|-----------|------------|---------------------------------------------------------|
+| Naive    | 17:23:284 | 0          | Buffed I/O                                              |
+| Naive+   | 09:47:801 | +07:35:483 | Remove unnecessary allocations, assignments, and prints |
+| Naive++  | 09:32:318 | +00:15:483 | StringIO to speed up the generating of results          |
 
 ---
 
 
 ### Rust
-| Approach | Time      | Delta | Notes |
-|----------|-----------|-------|-------|
-| Naive    | 20:08:179 | 0     |       |
+| Approach | Time      | Delta      | Notes                                                   |
+|----------|-----------|------------|---------------------------------------------------------|
+| Naive    | 05:44:451 | 0          | Buffed I/O                                              |
+| Naive+   | 04:04:033 | +01:40:418 | Remove unnecessary allocations, assignments, and prints |
+| Naive++  | 03:58:401 | +00:05:631 | Build result with String::push_str and then print       |
 
 ---
 
 
 ### C++
-| Approach | Time      | Delta | Notes               |
-|----------|-----------|-------|---------------------|
-| Naive    | 63:11.360 | 0     | std::iostreams suck |
+| Approach | Time      | Delta      | Notes                                                   |
+|----------|-----------|------------|---------------------------------------------------------|
+| Naive    | 05:25:736 | 0          | std::iostreams suck                                     |
+| Naive+   | 05:16:365 | +00:09:371 | Remove unnecessary allocations, assignments, and prints |
 
 ---

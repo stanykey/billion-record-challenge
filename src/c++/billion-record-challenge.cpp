@@ -10,47 +10,87 @@
 
 #include <cxxopts.hpp>
 
-
 struct Stats {
-    std::string city;
+    double      min   = std::numeric_limits<double>::max();
+    double      max   = std::numeric_limits<double>::min();
+    double      sum   = 0.0;
+    std::size_t count = 0;
 
-    float       min_temperature = std::numeric_limits<float>::max();
-    float       max_temperature = std::numeric_limits<float>::min();
-    float       sum             = 0.0f;
-    std::size_t count           = 0;
-
-    [[nodiscard]] float average() const {
+    [[nodiscard]] double mean() const {
         if (count == 0) {
-            return 0.0f;
+            return 0.0;
         }
 
-        return sum / static_cast<float>(count);
+        return sum / static_cast<double>(count);
     }
 };
 
-
-[[nodiscard]] float parse_float(std::string_view str) {
-    float value = 0.0f;
-    std::ignore = std::from_chars(str.data(), str.data() + str.size(), value);
+[[nodiscard]] double parse_temperature(std::string_view str) {
+    double value = 0.0;
+    std::ignore  = std::from_chars(str.data(), str.data() + str.size(), value);
     return value;
 }
-
 
 [[nodiscard]] std::string time_past_since(const std::chrono::system_clock::time_point& start_point) {
     const auto current_time = std::chrono::system_clock::now();
     auto       delta        = duration_cast<std::chrono::milliseconds>(current_time - start_point);
 
-    const auto minutes = duration_cast<std::chrono::minutes>(delta);
-    delta -= minutes;
+    const auto minutes      = duration_cast<std::chrono::minutes>(delta);
+    const auto seconds      = duration_cast<std::chrono::seconds>(delta - minutes);
+    const auto milliseconds = duration_cast<std::chrono::milliseconds>(delta - minutes - seconds);
 
-    const auto seconds = duration_cast<std::chrono::seconds>(delta);
-    delta -= seconds;
-
-    const auto milliseconds = duration_cast<std::chrono::milliseconds>(delta);
-
-    return std::format("{:02d}:{:02d}.{:03d}", minutes.count(), seconds.count(), milliseconds.count());
+    return std::format("{:02d}:{:02d}:{:03d}", minutes.count(), seconds.count(), milliseconds.count());
 }
 
+[[nodiscard]] std::unordered_map<std::string, Stats> process_measurements(const std::filesystem::path& source_path) {
+    std::unordered_map<std::string, Stats> stats(1'000);
+
+    std::string   line;
+    std::ifstream source(source_path);
+    while (std::getline(source, line)) {
+        const std::size_t delimiter_pos = line.find(';');
+
+        const std::string      name(line.data(), delimiter_pos);
+        const std::string_view temperature_string(line.data() + delimiter_pos + 1);
+
+        if (!stats.contains(name)) {
+            stats.emplace(name, Stats{});
+        }
+        auto& record = stats[name];
+
+        const auto temperature = parse_temperature(temperature_string);
+        if (temperature < record.min) {
+            record.min = temperature;
+        }
+        if (temperature > record.max) {
+            record.max = temperature;
+        }
+
+        record.sum += temperature;
+        record.count++;
+    }
+
+    return stats;
+}
+
+void print_statistic(const std::unordered_map<std::string, Stats>& stats) {
+    using Item = std::unordered_map<std::string, Stats>::const_iterator;
+
+    std::vector<Item> items;
+    items.reserve(stats.size());
+    for (auto it = stats.cbegin(); it != stats.cend(); ++it) {
+        items.emplace_back(it);
+    }
+    std::sort(items.begin(), items.end(), [](const Item& lhs, const Item& rhs) { return lhs->first < rhs->first; });
+
+    std::cout << "{";
+    for (const auto& item : items) {
+        const auto& key  = item->first;
+        const auto& data = item->second;
+        std::cout << std::format("{}/{}/{:.1f}/{}, ", key, data.min, data.mean(), data.max);
+    }
+    std::cout << "}\n";
+}
 
 int main(int argc, const char* argv[]) {
     std::ios::sync_with_stdio(false);
@@ -71,49 +111,11 @@ int main(int argc, const char* argv[]) {
         return 1;
     }
 
-    std::ifstream                          source(source_path);
-    std::unordered_map<std::string, Stats> stats(1'000);
+    const auto start_point = std::chrono::system_clock::now();
 
-    std::string line;
-    std::size_t record_processed = 0;
-    const auto  start_point      = std::chrono::system_clock::now();
-    while (std::getline(source, line)) {
-        const std::size_t delimiter_pos = line.find(';');
+    const auto stats = process_measurements(source_path);
+    print_statistic(stats);
 
-        const std::string      name(line.data(), delimiter_pos);
-        const std::string_view temperature_string(line.data() + delimiter_pos + 1);
-
-        auto [it, inserted] = stats.try_emplace(name, Stats{});
-        auto& record        = it->second;
-        if (inserted) {
-            record.city = name;
-        }
-
-        const auto temperature = parse_float(temperature_string);
-        record.min_temperature = std::min(temperature, record.min_temperature);
-        record.max_temperature = std::max(temperature, record.max_temperature);
-        record.sum += temperature;
-        record.count++;
-
-        record_processed++;
-        if (record_processed > 0 && record_processed % 50'000'000 == 0) {
-            std::cout << format("Process {} measurements in {}\n", record_processed, time_past_since(start_point));
-        }
-    }
-
-    std::vector<Stats> records;
-    records.reserve(stats.size());
-    for (auto& [key, record] : stats) {
-        records.emplace_back(std::move(record));
-    }
-    stats.clear();
-
-    std::sort(records.begin(), records.end(), [](const Stats& lhs, const Stats& rhs) { return lhs.city < rhs.city; });
-
-    for (const auto& record : records) {
-        std::cout << format("{}/{}/{}/{}\n", record.city, record.min_temperature, record.max_temperature, record.average());
-    }
-
-    std::cout << format("The file was processed in {}\n", time_past_since(start_point));
+    std::cout << std::format("The file was processed in {}\n", time_past_since(start_point));
     return 0;
 }

@@ -21,22 +21,14 @@ struct Arguments {
 
 #[derive(Debug)]
 struct Stats {
-    city: String,
-    min_temperature: f64,
-    max_temperature: f64,
+    min: f64,
+    max: f64,
     sum: f64,
     count: usize,
 }
 
 impl Stats {
-    fn new(city: String) -> Self {
-        Self {
-            city,
-            ..Default::default()
-        }
-    }
-
-    fn average(&self) -> f64 {
+    fn mean(&self) -> f64 {
         match self.count {
             0 => 0.0,
             count => self.sum / count as f64,
@@ -47,9 +39,8 @@ impl Stats {
 impl Default for Stats {
     fn default() -> Self {
         Self {
-            city: String::default(),
-            min_temperature: f64::INFINITY,
-            max_temperature: f64::NEG_INFINITY,
+            min: f64::INFINITY,
+            max: f64::NEG_INFINITY,
             sum: 0.0,
             count: 0,
         }
@@ -67,6 +58,60 @@ fn format_duration(duration: Duration) -> String {
     format!("{:02}:{:02}:{:03}", minutes, seconds, milliseconds)
 }
 
+fn process_measurements(path: &Path) -> HashMap<String, Stats> {
+    let file = File::open(path).unwrap();
+    let buffer_size = 4096 * 4096;
+    let reader = BufReader::with_capacity(buffer_size, file);
+
+    let mut stats: HashMap<String, Stats> = HashMap::new();
+    for line in reader.lines() {
+        let line_content = line.unwrap();
+        let (city, temperature_string) = line_content.split_once(";").unwrap();
+
+        let city = city.to_string();
+        let temperature = temperature_string.parse::<f64>().unwrap();
+        if !stats.contains_key(&city) {
+            stats.insert(city.clone(), Stats::default());
+        }
+        let record = stats.get_mut(&city).unwrap();
+
+        if temperature < record.min {
+            record.min = temperature;
+        }
+
+        if temperature > record.max {
+            record.max = temperature;
+        }
+
+        record.sum += temperature;
+        record.count += 1;
+    }
+
+    return stats;
+}
+
+fn print_statistic(stats: &HashMap<String, Stats>) {
+    let mut keys: Vec<&String> = stats.keys().collect();
+    keys.sort_by(|a, b| a.cmp(&b));
+
+    let mut result = String::new();
+    result.push_str("{");
+    for key in keys {
+        let record = stats.get(key).unwrap();
+        let info = format!(
+            "{}={}/{:.1}/{}, ",
+            key,
+            record.min,
+            record.mean(),
+            record.max
+        );
+        result.push_str(&info);
+    }
+    result.push_str("}");
+
+    println!("{result}");
+}
+
 fn main() {
     let args = Arguments::parse();
     let path = Path::new(&args.source);
@@ -75,48 +120,10 @@ fn main() {
         process::exit(1);
     }
 
-    let file = File::open(path).unwrap();
-    let reader = BufReader::new(file);
-
     let start_point = Instant::now();
-    let mut record_processed = 0;
-    let mut stats: HashMap<String, Stats> = HashMap::new();
-    for line in reader.lines() {
-        let line_content = line.unwrap();
-        let (city, temperature_string) = line_content.split_once(";").unwrap();
 
-        let city = city.to_string();
-        let temperature = temperature_string.parse::<f64>().unwrap();
-        let record = stats
-            .entry(city.clone())
-            .or_insert(Stats::new(city.clone()));
-
-        record.min_temperature = temperature.min(record.min_temperature);
-        record.max_temperature = temperature.max(record.max_temperature);
-        record.sum += temperature;
-        record.count += 1;
-
-        record_processed += 1;
-        if record_processed > 0 && record_processed % 50_000_000 == 0 {
-            println!(
-                "Process {} measurements in {}",
-                record_processed,
-                format_duration(start_point.elapsed())
-            );
-        }
-    }
-
-    let mut records: Vec<&Stats> = stats.values().collect();
-    records.sort_by(|a, b| a.city.cmp(&b.city));
-    for record in records {
-        println!(
-            "{}/{}/{}/{:.1}",
-            record.city,
-            record.min_temperature,
-            record.max_temperature,
-            record.average()
-        );
-    }
+    let stats = process_measurements(path);
+    print_statistic(&stats);
 
     println!(
         "The file was processed in {}",

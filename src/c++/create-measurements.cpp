@@ -462,33 +462,30 @@ std::string time_past_since(const std::chrono::system_clock::time_point& start_p
 }
 
 void generate_measurements(const std::filesystem::path& file, std::size_t records) {
-    std::ofstream outfile(file);
+    std::ofstream outfile(file, std::ios::binary);
     if (!outfile) {
         std::cerr << "Failed to open file for writing.\n";
         return;
     }
 
-    const auto         start_point       = std::chrono::system_clock::now();
-    std::size_t        records_generated = 0;
+    const auto         start_point = std::chrono::system_clock::now();
     std::random_device rd;
     std::mt19937       generator(rd());
     IntDisribution     distribution(0, WEATHER_STATIONS.size() - 1);
-    while (records > 0) {
-        const auto chunk_size = std::min(CHUNK_SIZE, records);
-        records -= chunk_size;
+
+    auto records_left = records;
+    while (records_left > 0) {
+        const auto chunk_size = std::min(CHUNK_SIZE, records_left);
+        records_left -= chunk_size;
 
         for (auto i = 0u; i < chunk_size; ++i) {
             const auto& station = WEATHER_STATIONS[distribution(generator)];
-            outfile << station.name << ";" << station.measurement() << "\n";
-        }
-
-        records_generated += chunk_size;
-        if (records_generated % 50000000 == 0) {
-            std::cout << format("Wrote {:L} measurements in {}\n", records_generated, time_past_since(start_point));
+            const auto  line    = std::format("{};{}\n", station.name, station.measurement());
+            outfile.write(line.data(), static_cast<std::streamsize>(line.size()));
         }
     }
 
-    std::cout << format("Created file with {:L} measurements in {}\n", records, time_past_since(start_point));
+    std::cout << format("Created file with {} measurements in {}\n", records, time_past_since(start_point));
 }
 
 int main(int argc, char* argv[]) {

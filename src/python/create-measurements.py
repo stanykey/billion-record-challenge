@@ -459,20 +459,16 @@ def main(file: Path, records: int) -> None:
     """Generate a measurements file with a given number of records."""
     start_point = datetime.now()
 
-    with file.open("w", encoding="utf-8") as outfile:
-        records_generated = 0
+    with file.open("wb") as outfile:
         records_left = records
         while records_left > 0:
             chunk_size = min(CHUNK_SIZE, records_left)
             records_left -= chunk_size
 
             stations = choices(WEATHER_STATIONS, k=chunk_size)
-            lines = tuple(f"{station.name};{station.measurement()}\n" for station in stations)
-            outfile.writelines(lines)
-
-            records_generated += chunk_size
-            if records_generated > 0 and records_generated % 50_000_000 == 0:
-                echo(f"Wrote {records_generated:,} measurements in {time_past_since(start_point)}")
+            content = "\n".join(f"{station.name};{station.measurement()}" for station in stations)
+            outfile.write(content.encode())
+        outfile.write(b"\n")
 
     echo(f"Created file with {records:,} measurements in {time_past_since(start_point)}")
 

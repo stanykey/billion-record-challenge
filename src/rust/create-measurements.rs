@@ -479,13 +479,7 @@ fn main() {
     let start = Instant::now();
     let outfile = File::create(args.path).unwrap();
     let mut stream = BufWriter::new(outfile);
-    for i in 0..args.records {
-        if i > 0 && i % 50_000_000 == 0 {
-            println!(
-                "Wrote {i} measurements in {}",
-                format_duration(start.elapsed())
-            );
-        }
+    for _ in 0..args.records {
         let station = &stations[rand::thread_rng().gen_range(0..stations.len())];
         let line = format!("{};{:.1}\n", station.id, station.measurement());
         stream.write(line.as_bytes()).unwrap();

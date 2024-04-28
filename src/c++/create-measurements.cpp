@@ -480,7 +480,7 @@ void generate_measurements(const std::filesystem::path& file, std::size_t record
 
         for (auto i = 0u; i < chunk_size; ++i) {
             const auto& station = WEATHER_STATIONS[distribution(generator)];
-            const auto  line    = std::format("{};{}\n", station.name, station.measurement());
+            const auto  line    = std::format("{};{:.1f}\n", station.name, station.measurement());
             outfile.write(line.data(), static_cast<std::streamsize>(line.size()));
         }
     }

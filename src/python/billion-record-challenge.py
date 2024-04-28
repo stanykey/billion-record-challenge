@@ -35,19 +35,22 @@ def time_past_since(point: datetime) -> str:
     return f"{minutes:02d}:{seconds:02d}:{milliseconds:03d}"
 
 
-def parse_temperature(value: str) -> float:
+def parse_temperature(value: bytes) -> float:
     """Parse the temperature."""
     return float(value)
 
 
-def process_line(line: str, stats: dict[str, Stats]) -> None:
-    """Parse the file record line."""
-    city, _, value = line.partition(";")
-    if city not in stats:
-        stats[city] = Stats()
-    record = stats[city]
+def parse_line(line: bytes) -> tuple[bytes, float]:
+    station, _, value = line.partition(b";")
+    return station, parse_temperature(value)
 
-    temperature = parse_temperature(value)
+
+def process_line(line: bytes, stats: dict[bytes, Stats]) -> None:
+    """Parse the file record line."""
+    station, temperature = parse_line(line)
+    if station not in stats:
+        stats[station] = Stats()
+    record = stats[station]
 
     if temperature < record.min:
         record.min = temperature
@@ -59,21 +62,22 @@ def process_line(line: str, stats: dict[str, Stats]) -> None:
     record.count += 1
 
 
-def process_measurements(source: Path) -> dict[str, Stats]:
+def process_measurements(source: Path) -> dict[bytes, Stats]:
     buffer_size = 4096 * 4096
-    stats: dict[str, Stats] = dict()
-    with source.open("r", encoding="utf-8", buffering=buffer_size) as file:
+    stats: dict[bytes, Stats] = dict()
+    with source.open("rb", buffering=buffer_size) as file:
         for line in file:
             process_line(line, stats)
 
     return stats
 
 
-def print_statistic(stats: dict[str, Stats]) -> None:
+def print_statistic(stats: dict[bytes, Stats]) -> None:
     with StringIO() as buffer:
         buffer.write("{")
         for key in sorted(stats.keys()):
-            buffer.write(f"{key}={stats[key]}, ")
+            station_name = key.decode(encoding="utf-8", errors="ignore")
+            buffer.write(f"{station_name}={stats[key]}, ")
         buffer.write("}")
 
         print(buffer.getvalue())
@@ -87,7 +91,7 @@ def main(source: Path) -> None:
     The CSV file is expected to have the following format:
 
     \b
-        <city>;<temperature>
+        <station>;<temperature>
         Example:
         Abha;5.0
         Abidjan;26.0
@@ -96,8 +100,8 @@ def main(source: Path) -> None:
         Addis Ababa;16.0
         Adelaide;17.3
 
-    This program reads measurements from a CSV file, where each line represents a city and its temperature. The
-    temperature is provided in Celsius. The program calculates and prints statistics for each city, including the
+    This program reads measurements from a CSV file, where each line represents a station and its temperature. The
+    temperature is provided in Celsius. The program calculates and prints statistics for each station, including the
     minimum, average, and maximum temperature.
     """
     if not source.is_file():

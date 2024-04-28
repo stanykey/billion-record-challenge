@@ -21,7 +21,7 @@ I will try to add grids with progress improvements for each language.
 ---
 
 
-### Python (3.11, Cython)
+### Python (3.12, Cython)
 | Approach | Time      | Delta      | Notes                                                   |
 |----------|-----------|------------|---------------------------------------------------------|
 | Naive    | 17:23:284 | 0          | Buffed I/O                                              |

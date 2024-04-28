@@ -27,6 +27,7 @@ I will try to add grids with progress improvements for each language.
 | Naive    | 17:23:284 | 0          | Buffed I/O                                              |
 | Naive+   | 09:47:801 | +07:35:483 | Remove unnecessary allocations, assignments, and prints |
 | Naive++  | 09:32:318 | +00:15:483 | StringIO to speed up the generating of results          |
+| Naive++  | 10:09:501 | -00:37:182 | Add more functions for readability purposes             |
 
 ---
 

@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
+from mmap import ACCESS_READ
+from mmap import mmap
 from pathlib import Path
 from sys import exit
 
@@ -66,10 +68,10 @@ def process_line(line: bytes, registry: dict[bytes, Stats]) -> None:
 
 
 def process_measurements(source: Path) -> dict[bytes, Stats]:
-    buffer_size = 4096 * 4096
-    registry: dict[bytes, Stats] = dict()
-    with source.open("rb", buffering=buffer_size) as file:
-        for line in file:
+    registry: dict[bytes, Stats] = {}
+
+    with source.open("rb") as file, mmap(file.fileno(), length=0, access=ACCESS_READ) as mmapped_file:
+        for line in iter(mmapped_file.readline, b""):
             process_line(line, registry)
 
     return registry

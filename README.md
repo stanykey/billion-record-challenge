@@ -28,12 +28,14 @@ I will try to add grids with progress improvements for each language.
 |----------|-----------|------------|--------------------------------------------------------------------------------------------------|
 | Naive    | 17:23:284 |            | Buffed I/O                                                                                       |
 | Naive+   | 11:06:184 | +06:17:100 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
+| Naive+   | 10:52:539 | +00:13:644 | Memory file mapping                                                                              |
 
 #### WSL (Ubuntu 24)
 | Approach | Time      | Delta      | Notes                                                                                            |
 |----------|-----------|------------|--------------------------------------------------------------------------------------------------|
 | Naive    | 18:24:421 |            | Buffed I/O                                                                                       |
 | Naive+   | 07:46:911 | +10:37:509 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
+| Naive+   | 07:37:350 | +00:09:561 | Memory file mapping                                                                              |
 
 ---
 

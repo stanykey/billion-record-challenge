@@ -5,11 +5,12 @@ More details of the challenge at [blog post](https://www.morling.dev/blog/one-bi
 ---
 
 
-## Testing Environment
-- **Processor:** AMD Ryzen 5 3600 6-Core Processor                 3.59 GHz
-- **RAM:** 128 GB
+## Testing (Development) Environment
 - **System type:** Windows 11 Pro, 64-bit, x64-based processor
+- **Processor:** AMD Ryzen 5 3600 6-Core Processor 3.59 GHz
+- **RAM:** 128 GB
 - **Disk:** Samsung SSD 970 EVO Plus 1TB
+
 ---
 
 
@@ -22,13 +23,17 @@ I will try to add grids with progress improvements for each language.
 
 
 ### Python (3.12, Cython)
-| Approach | Time      | Delta      | Notes                                                   |
-|----------|-----------|------------|---------------------------------------------------------|
-| Naive    | 17:23:284 | 0          | Buffed I/O                                              |
-| Naive+   | 09:47:801 | +07:35:483 | Remove unnecessary allocations, assignments, and prints |
-| Naive++  | 09:32:318 | +00:15:483 | StringIO to speed up the generating of results          |
-| Naive++  | 10:09:501 | -00:37:182 | Add more functions for readability purposes             |
-| Naive++  | 09:53:063 | +00:16:437 | Switch onto reading in binary mode                      |
+#### Windows
+| Approach | Time      | Delta      | Notes                                                                                            |
+|----------|-----------|------------|--------------------------------------------------------------------------------------------------|
+| Naive    | 17:23:284 |            | Buffed I/O                                                                                       |
+| Naive+   | 11:06:184 | +06:17:100 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
+
+#### WSL (Ubuntu 24)
+| Approach | Time      | Delta      | Notes                                                                                            |
+|----------|-----------|------------|--------------------------------------------------------------------------------------------------|
+| Naive    | 18:24:421 |            | Buffed I/O                                                                                       |
+| Naive+   | 07:46:911 | +10:37:509 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
 
 ---
 

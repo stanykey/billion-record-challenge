@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from datetime import datetime
-from io import StringIO
 from pathlib import Path
 from sys import exit
 
@@ -11,16 +10,25 @@ from click import echo
 
 @dataclass(slots=True)
 class Stats:
-    min: float = float("inf")
-    max: float = float("-inf")
-    sum: float = 0.0
-    count: int = 0
+    min: float
+    max: float
+    sum: float
+    count: int
 
+    @property
+    def minimum(self) -> float:
+        return self.min
+
+    @property
+    def maximum(self) -> float:
+        return self.max
+
+    @property
     def mean(self) -> float:
-        return self.sum / self.count if self.count > 0 else 0.0
+        if self.count == 0:
+            return 0.0
 
-    def __str__(self) -> str:
-        return f"{self.min:.1f}/{self.mean():.1f}/{self.max:.1f}"
+        return self.sum / self.count
 
 
 def time_past_since(point: datetime) -> str:
@@ -35,52 +43,44 @@ def time_past_since(point: datetime) -> str:
     return f"{minutes:02d}:{seconds:02d}:{milliseconds:03d}"
 
 
-def parse_temperature(value: bytes) -> float:
-    """Parse the temperature."""
-    return float(value)
-
-
 def parse_line(line: bytes) -> tuple[bytes, float]:
     station, _, value = line.partition(b";")
-    return station, parse_temperature(value)
+    return station, float(value)
 
 
-def process_line(line: bytes, stats: dict[bytes, Stats]) -> None:
-    """Parse the file record line."""
+def process_line(line: bytes, registry: dict[bytes, Stats]) -> None:
     station, temperature = parse_line(line)
-    if station not in stats:
-        stats[station] = Stats()
-    record = stats[station]
+    if station in registry:
+        record = registry[station]
 
-    if temperature < record.min:
-        record.min = temperature
+        if record.min > temperature:
+            record.min = temperature
 
-    if temperature > record.max:
-        record.max = temperature
+        if record.max < temperature:
+            record.max = temperature
 
-    record.sum += temperature
-    record.count += 1
+        record.sum += temperature
+        record.count += 1
+    else:
+        registry[station] = Stats(temperature, temperature, temperature, 1)
 
 
 def process_measurements(source: Path) -> dict[bytes, Stats]:
     buffer_size = 4096 * 4096
-    stats: dict[bytes, Stats] = dict()
+    registry: dict[bytes, Stats] = dict()
     with source.open("rb", buffering=buffer_size) as file:
         for line in file:
-            process_line(line, stats)
+            process_line(line, registry)
 
-    return stats
+    return registry
 
 
-def print_statistic(stats: dict[bytes, Stats]) -> None:
-    with StringIO() as buffer:
-        buffer.write("{")
-        for key in sorted(stats.keys()):
-            station_name = key.decode(encoding="utf-8", errors="ignore")
-            buffer.write(f"{station_name}={stats[key]}, ")
-        buffer.write("}")
-
-        print(buffer.getvalue())
+def print_statistic(registry: dict[bytes, Stats]) -> None:
+    result = ", ".join(
+        f"{station.decode()}={stats.minimum:.1f}/{stats.mean:.1f}/{stats.maximum:.1f}"
+        for station, stats in sorted(registry.items())
+    )
+    print("{", result, "}", sep="")
 
 
 @command("billion-record-challenge", options_metavar="")
@@ -110,8 +110,8 @@ def main(source: Path) -> None:
 
     start_point = datetime.now()
 
-    stats = process_measurements(source)
-    print_statistic(stats)
+    registry = process_measurements(source)
+    print_statistic(registry)
 
     echo(f"The file was processed in {time_past_since(start_point)}")
 

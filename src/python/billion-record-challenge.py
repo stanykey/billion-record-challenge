@@ -1,13 +1,18 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from mmap import ACCESS_READ
+from mmap import ALLOCATIONGRANULARITY
 from mmap import mmap
+from multiprocessing import Pool
+from os import cpu_count
 from pathlib import Path
 from sys import exit
 
 from click import argument
 from click import command
 from click import echo
+from click import option
 
 
 @dataclass(slots=True)
@@ -67,14 +72,54 @@ def process_line(line: bytes, registry: dict[bytes, Stats]) -> None:
         registry[station] = Stats(temperature, temperature, temperature, 1)
 
 
-def process_measurements(source: Path) -> dict[bytes, Stats]:
-    registry: dict[bytes, Stats] = {}
+def gather(registries: Iterable[dict[bytes, Stats]]) -> dict[bytes, Stats]:
+    merged: dict[bytes, Stats] = {}
+    for registry in registries:
+        for station, stats in registry.items():
+            if station in merged:
+                record = merged[station]
+                record.min = min(record.min, stats.min)
+                record.max = max(record.max, stats.max)
+                record.sum += stats.sum
+                record.count += stats.count
+            else:
+                merged[station] = stats
 
-    with source.open("rb") as file, mmap(file.fileno(), length=0, access=ACCESS_READ) as mmapped_file:
+    return merged
+
+
+def process_chunk(source: Path, start_byte: int, end_byte: int) -> dict[bytes, Stats]:
+    offset = (start_byte // ALLOCATIONGRANULARITY) * ALLOCATIONGRANULARITY
+    length = end_byte - offset
+    registry: dict[bytes, Stats] = {}
+    with source.open("rb") as file, mmap(file.fileno(), length, access=ACCESS_READ, offset=offset) as mmapped_file:
+        mmapped_file.seek(start_byte - offset)
         for line in iter(mmapped_file.readline, b""):
             process_line(line, registry)
 
     return registry
+
+
+def process_measurements(source: Path, pool_size: int) -> dict[bytes, Stats]:
+    chunks = []
+    file_size = source.stat().st_size
+    base_chunk_size = file_size // pool_size
+
+    with source.open("rb") as file, mmap(file.fileno(), length=0, access=ACCESS_READ) as mmapped_file:
+        start_byte = 0
+        for _ in range(pool_size):
+            end_byte = min(start_byte + base_chunk_size, file_size)
+            end_byte = mmapped_file.find(b"\n", end_byte)
+            end_byte = end_byte + 1 if end_byte != -1 else file_size
+
+            chunks.append((source, start_byte, end_byte))
+
+            start_byte = end_byte
+
+    with Pool(processes=pool_size) as pool:
+        results = pool.starmap(process_chunk, chunks)
+
+    return gather(results)
 
 
 def print_statistic(registry: dict[bytes, Stats]) -> None:
@@ -87,7 +132,8 @@ def print_statistic(registry: dict[bytes, Stats]) -> None:
 
 @command("billion-record-challenge", options_metavar="")
 @argument("source", type=Path)
-def main(source: Path) -> None:
+@option("--pool-size", default=cpu_count(), type=int, help="Number of CPUs to use", show_default=True)
+def main(source: Path, pool_size: int) -> None:
     """
     Read measurements from a CSV file and print statistics.
     The CSV file is expected to have the following format:
@@ -112,7 +158,7 @@ def main(source: Path) -> None:
 
     start_point = datetime.now()
 
-    registry = process_measurements(source)
+    registry = process_measurements(source, pool_size)
     print_statistic(registry)
 
     echo(f"The file was processed in {time_past_since(start_point)}")

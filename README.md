@@ -29,6 +29,8 @@ I will try to add grids with progress improvements for each language.
 | Naive    | 17:23:284 |            | Buffed I/O                                                                                       |
 | Naive+   | 11:06:184 | +06:17:100 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
 | Naive+   | 10:52:539 | +00:13:644 | Memory file mapping                                                                              |
+| Naive+   | 02:10:640 | +08:41:899 | Multicore execution (12 CPU)                                                                     |
+
 
 #### WSL (Ubuntu 24)
 | Approach | Time      | Delta      | Notes                                                                                            |
@@ -36,6 +38,7 @@ I will try to add grids with progress improvements for each language.
 | Naive    | 18:24:421 |            | Buffed I/O                                                                                       |
 | Naive+   | 07:46:911 | +10:37:509 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
 | Naive+   | 07:37:350 | +00:09:561 | Memory file mapping                                                                              |
+| Naive+   | 01:19:774 | +06:17:576 | Multicore execution (12 CPU)                                                                     |
 
 ---
 

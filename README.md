@@ -43,6 +43,27 @@ I will try to add grids with progress improvements for each language.
 ---
 
 
+### Python (3.10, Pypy)
+#### Windows 11
+| Approach | Time      | Delta      | Notes                                                                                            |
+|----------|-----------|------------|--------------------------------------------------------------------------------------------------|
+| Naive    | 05:54.979 |            | Buffed I/O                                                                                       |
+| Naive+   | 04:38:311 | +01:16:668 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
+| Naive+   | 04:16:455 | +00:21:856 | Memory file mapping                                                                              |
+| Naive+   | 00:41:926 | +03:34:528 | Multicore execution (12 CPU)                                                                     |
+
+
+#### WSL (Ubuntu 24)
+| Approach | Time      | Delta      | Notes                                                                                            |
+|----------|-----------|------------|--------------------------------------------------------------------------------------------------|
+| Naive    | 04:05.491 |            | Buffed I/O                                                                                       |
+| Naive+   | 03:00:459 | +01:05:031 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
+| Naive+   | 02:51:380 | +00:09:079 | Memory file mapping                                                                              |
+| Naive+   | 00:24:733 | +02:26:646 | Multicore execution (12 CPU)                                                                     |
+
+---
+
+
 ### Rust
 | Approach | Time      | Delta      | Notes                                                   |
 |----------|-----------|------------|---------------------------------------------------------|

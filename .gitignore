@@ -6,6 +6,7 @@ data/*.txt
 
 # Python
 .venv
+.pypy
 
 # C++
 cmake-build-*

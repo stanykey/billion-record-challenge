@@ -30,6 +30,7 @@ I will try to add grids with progress improvements for each language.
 | 11:06:184 | +06:17:100 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
 | 10:52:539 | +00:13:644 | Memory file mapping                                                                              |
 | 02:10:640 | +08:41:899 | Multicore execution (12 CPU)                                                                     |
+| 02:47:864 | -00:37:223 | Change temperatures representation, parsing and processing                                       |
 
 
 #### WSL (Ubuntu 24)
@@ -39,6 +40,7 @@ I will try to add grids with progress improvements for each language.
 | 07:46:911 | +10:37:509 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
 | 07:37:350 | +00:09:561 | Memory file mapping                                                                              |
 | 01:19:774 | +06:17:576 | Multicore execution (12 CPU)                                                                     |
+| 02:00:558 | -00:40:783 | Change temperatures representation, parsing and processing                                       |
 
 ---
 
@@ -51,6 +53,7 @@ I will try to add grids with progress improvements for each language.
 | 04:38:311 | +01:16:668 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
 | 04:16:455 | +00:21:856 | Memory file mapping                                                                              |
 | 00:41:926 | +03:34:528 | Multicore execution (12 CPU)                                                                     |
+| 00:16:316 | +00:25:609 | Change temperatures representation, parsing and processing                                       |
 
 
 #### WSL (Ubuntu 24)
@@ -60,6 +63,7 @@ I will try to add grids with progress improvements for each language.
 | 03:00:459 | +01:05:031 | Read file in binary mode<br/>Remove debug prints<br/>Remove unnecessary allocations, assignments |
 | 02:51:380 | +00:09:079 | Memory file mapping                                                                              |
 | 00:24:733 | +02:26:646 | Multicore execution (12 CPU)                                                                     |
+| 00:13:887 | +00:10:846 | Change temperatures representation, parsing and processing                                       |
 
 ---
 

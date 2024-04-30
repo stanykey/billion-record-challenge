@@ -17,25 +17,25 @@ from click import option
 
 @dataclass(slots=True)
 class Stats:
-    min: float
-    max: float
-    sum: float
+    min: int
+    max: int
+    sum: int
     count: int
 
     @property
     def minimum(self) -> float:
-        return self.min
+        return self.min * 0.1
 
     @property
     def maximum(self) -> float:
-        return self.max
+        return self.max * 0.1
 
     @property
     def mean(self) -> float:
         if self.count == 0:
             return 0.0
 
-        return self.sum / self.count
+        return self.sum / self.count * 0.1
 
 
 def time_past_since(point: datetime) -> str:
@@ -50,9 +50,25 @@ def time_past_since(point: datetime) -> str:
     return f"{minutes:02d}:{seconds:02d}:{milliseconds:03d}"
 
 
-def parse_line(line: bytes) -> tuple[bytes, float]:
-    station, _, value = line.partition(b";")
-    return station, float(value)
+def parse_temperature(x: bytes) -> int:
+    """Parse the temperature (specific float) from a bytes array as an integer."""
+
+    # The ASCII offset for '0' is 48.
+    match len(x):
+        case 5:  # b"-99.9"
+            return -100 * (x[1] - 48) - 10 * (x[2] - 48) - (x[4] - 48)
+        case 4:
+            if x[0] == 45:  # b"-9.9"
+                return -10 * (x[1] - 48) - (x[3] - 48)
+            else:  # b"99.9"
+                return 100 * (x[0] - 48) + 10 * (x[1] - 48)
+        case _:  # b"9.9"
+            return 10 * (x[0] - 48) + (x[2] - 48)
+
+
+def parse_line(line: bytes) -> tuple[bytes, int]:
+    index = line.index(b";")
+    return line[:index], parse_temperature(line[index + 1 : -1])
 
 
 def process_line(line: bytes, registry: dict[bytes, Stats]) -> None:

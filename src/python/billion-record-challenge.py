@@ -75,13 +75,8 @@ def process_line(line: bytes, registry: dict[bytes, Stats]) -> None:
     station, temperature = parse_line(line)
     if station in registry:
         record = registry[station]
-
-        if record.min > temperature:
-            record.min = temperature
-
-        if record.max < temperature:
-            record.max = temperature
-
+        record.min = min(record.min, temperature)
+        record.max = max(record.max, temperature)
         record.sum += temperature
         record.count += 1
     else:

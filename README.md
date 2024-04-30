@@ -31,6 +31,7 @@ I will try to add grids with progress improvements for each language.
 | 10:52:539 | +00:13:644 | Memory file mapping                                                                              |
 | 02:10:640 | +08:41:899 | Multicore execution (12 CPU)                                                                     |
 | 02:47:864 | -00:37:223 | Change temperatures representation, parsing and processing                                       |
+| 03:28:583 | -00:40:719 | [Bonus] Replace two fragments of `if x lesser/greater b then x = b` with `x = min/max(x, b)`     |
 
 
 #### WSL (Ubuntu 24)
@@ -41,6 +42,7 @@ I will try to add grids with progress improvements for each language.
 | 07:37:350 | +00:09:561 | Memory file mapping                                                                              |
 | 01:19:774 | +06:17:576 | Multicore execution (12 CPU)                                                                     |
 | 02:00:558 | -00:40:783 | Change temperatures representation, parsing and processing                                       |
+| 02:46:462 | -00:45:904 | [Bonus] Replace two fragments of `if x lesser/greater b then x = b` with `x = min/max(x, b)`     |
 
 ---
 
@@ -54,6 +56,7 @@ I will try to add grids with progress improvements for each language.
 | 04:16:455 | +00:21:856 | Memory file mapping                                                                              |
 | 00:41:926 | +03:34:528 | Multicore execution (12 CPU)                                                                     |
 | 00:16:316 | +00:25:609 | Change temperatures representation, parsing and processing                                       |
+| 00:16:316 | +00:00:000 | [Bonus] Replace two fragments of `if x lesser/greater b then x = b` with `x = min/max(x, b)`     |
 
 
 #### WSL (Ubuntu 24)
@@ -64,6 +67,7 @@ I will try to add grids with progress improvements for each language.
 | 02:51:380 | +00:09:079 | Memory file mapping                                                                              |
 | 00:24:733 | +02:26:646 | Multicore execution (12 CPU)                                                                     |
 | 00:13:887 | +00:10:846 | Change temperatures representation, parsing and processing                                       |
+| 00:13:887 | +00:00:000 | [Bonus] Replace two fragments of `if x lesser/greater b then x = b` with `x = min/max(x, b)`     |
 
 ---
 

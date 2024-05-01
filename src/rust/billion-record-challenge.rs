@@ -53,6 +53,8 @@ impl Stats {
     }
 }
 
+type Registry = HashMap<String, Stats>;
+
 fn format_duration(duration: Duration) -> String {
     // Calculate minutes, seconds, and milliseconds
     let total_seconds = duration.as_secs();
@@ -89,7 +91,7 @@ fn parse_temperature(temperature: &str) -> i32 {
     }
 }
 
-fn process_line(line: &str, registry: &mut HashMap<String, Stats>) {
+fn process_line(line: &str, registry: &mut Registry) {
     let (city, temperature) = line.split_once(";").unwrap();
 
     let temperature = parse_temperature(&temperature);
@@ -104,19 +106,19 @@ fn process_line(line: &str, registry: &mut HashMap<String, Stats>) {
     }
 }
 
-fn process_measurements(path: &Path) -> HashMap<String, Stats> {
+fn process_measurements(path: &Path) -> Registry {
     let file = File::open(path).unwrap();
     let buffer_size = 4096 * 4096;
     let reader = BufReader::with_capacity(buffer_size, file);
 
-    let mut registry: HashMap<String, Stats> = HashMap::new();
+    let mut registry = Registry::default();
     for line in reader.lines() {
         process_line(line.unwrap().as_str(), &mut registry);
     }
     return registry;
 }
 
-fn print_statistic(registry: &HashMap<String, Stats>) {
+fn print_statistic(registry: &Registry) {
     let mut keys: Vec<&String> = registry.keys().collect();
     keys.sort_by(|a, b| a.cmp(&b));
 

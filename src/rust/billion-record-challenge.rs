@@ -21,28 +21,34 @@ struct Arguments {
 
 #[derive(Debug)]
 struct Stats {
-    min: f64,
-    max: f64,
-    sum: f64,
+    min: i32,
+    max: i32,
+    sum: i32,
     count: usize,
 }
 
 impl Stats {
+    fn new(temperature: i32) -> Self {
+        Self {
+            min: temperature,
+            max: temperature,
+            sum: temperature,
+            count: 1,
+        }
+    }
+
+    fn min(&self) -> f64 {
+        (self.min as f64) * 0.1
+    }
+
+    fn max(&self) -> f64 {
+        (self.max as f64) * 0.1
+    }
+
     fn mean(&self) -> f64 {
         match self.count {
             0 => 0.0,
-            count => self.sum / count as f64,
-        }
-    }
-}
-
-impl Default for Stats {
-    fn default() -> Self {
-        Self {
-            min: f64::INFINITY,
-            max: f64::NEG_INFINITY,
-            sum: 0.0,
-            count: 0,
+            count => self.sum as f64 / count as f64 * 0.1,
         }
     }
 }
@@ -58,8 +64,29 @@ fn format_duration(duration: Duration) -> String {
     format!("{:02}:{:02}:{:03}", minutes, seconds, milliseconds)
 }
 
-fn parse_temperature(temperature: &str) -> f64 {
-    temperature.parse::<f64>().unwrap()
+fn parse_temperature(temperature: &str) -> i32 {
+    let bytes = temperature.as_bytes();
+    match bytes.len() {
+        5 => {
+            // b"-99.9"
+            -100 * ((bytes[1] - b'0') as i32)
+                - 10 * ((bytes[2] - b'0') as i32)
+                - ((bytes[4] - b'0') as i32)
+        }
+        4 => {
+            if bytes[0] == b'-' {
+                // b"-9.9"
+                -10 * ((bytes[1] - b'0') as i32) - ((bytes[3] - b'0') as i32)
+            } else {
+                // b"99.9"
+                100 * ((bytes[0] - b'0') as i32) + 10 * ((bytes[1] - b'0') as i32)
+            }
+        }
+        _ => {
+            // b"9.9"
+            10 * ((bytes[0] - b'0') as i32) + ((bytes[2] - b'0') as i32)
+        }
+    }
 }
 
 fn process_line(line: &str, registry: &mut HashMap<String, Stats>) {
@@ -67,15 +94,7 @@ fn process_line(line: &str, registry: &mut HashMap<String, Stats>) {
 
     let temperature = parse_temperature(&temperature);
     if !registry.contains_key(city) {
-        registry.insert(
-            city.to_string(),
-            Stats {
-                min: temperature,
-                max: temperature,
-                sum: temperature,
-                count: 1,
-            },
-        );
+        registry.insert(city.to_string(), Stats::new(temperature));
     } else {
         let record = registry.get_mut(city).unwrap();
         record.min = temperature.min(record.min);
@@ -104,11 +123,11 @@ fn print_statistic(registry: &HashMap<String, Stats>) {
     let mut result = keys.iter().fold(String::new(), |mut report, key| {
         let record = registry.get(*key).unwrap();
         let info = format!(
-            "{}={}/{:.1}/{}, ",
+            "{}={:.1}/{:.1}/{:.1}, ",
             key,
-            record.min,
+            record.min(),
             record.mean(),
-            record.max
+            record.max()
         );
         report.push_str(&info);
         report

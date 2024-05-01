@@ -50,6 +50,41 @@ def time_past_since(point: datetime) -> str:
     return f"{minutes:02d}:{seconds:02d}:{milliseconds:03d}"
 
 
+class Statistics:
+    __slots__ = "_data"
+
+    def __init__(self) -> None:
+        self._data: dict[bytes, Stats] = dict()
+
+    def find(self, key: bytes) -> Stats | None:
+        return self._data.get(key, None)
+
+    def items(self) -> tuple[tuple[str, Stats], ...]:
+        return tuple((key.decode(encoding="utf-8", errors="ignore"), data) for key, data in self._data.items())
+
+    def __setitem__(self, key: bytes, value: Stats) -> None:
+        self._data[key] = value
+
+    def __getitem__(self, key: bytes) -> Stats:
+        return self._data[key]
+
+    def __contains__(self, key: bytes) -> bool:
+        return key in self._data
+
+    def __ior__(self, other: "Statistics") -> "Statistics":  # the `Self` is unavailable for Pypy (it was added in 3.11)
+        for key, data in other._data.items():
+            if key in self._data:
+                record = self._data[key]
+                record.min = min(record.min, data.min)
+                record.max = max(record.max, data.max)
+                record.sum += data.sum
+                record.count += data.count
+            else:
+                self._data[key] = data
+
+        return self
+
+
 def parse_temperature(x: bytes) -> int:
     """Parse the temperature (specific float) from a bytes array as an integer."""
 
@@ -71,10 +106,9 @@ def parse_line(line: bytes) -> tuple[bytes, int]:
     return line[:index], parse_temperature(line[index + 1 : -1])
 
 
-def process_line(line: bytes, registry: dict[bytes, Stats]) -> None:
+def process_line(line: bytes, registry: Statistics) -> None:
     station, temperature = parse_line(line)
-    if station in registry:
-        record = registry[station]
+    if record := registry.find(station):
         record.min = min(record.min, temperature)
         record.max = max(record.max, temperature)
         record.sum += temperature
@@ -83,26 +117,17 @@ def process_line(line: bytes, registry: dict[bytes, Stats]) -> None:
         registry[station] = Stats(temperature, temperature, temperature, 1)
 
 
-def gather(registries: Iterable[dict[bytes, Stats]]) -> dict[bytes, Stats]:
-    merged: dict[bytes, Stats] = {}
+def gather(registries: Iterable[Statistics]) -> Statistics:
+    merged = Statistics()
     for registry in registries:
-        for station, stats in registry.items():
-            if station in merged:
-                record = merged[station]
-                record.min = min(record.min, stats.min)
-                record.max = max(record.max, stats.max)
-                record.sum += stats.sum
-                record.count += stats.count
-            else:
-                merged[station] = stats
-
+        merged |= registry
     return merged
 
 
-def process_chunk(source: Path, start_byte: int, end_byte: int) -> dict[bytes, Stats]:
+def process_chunk(source: Path, start_byte: int, end_byte: int) -> Statistics:
     offset = (start_byte // ALLOCATIONGRANULARITY) * ALLOCATIONGRANULARITY
     length = end_byte - offset
-    registry: dict[bytes, Stats] = {}
+    registry = Statistics()
     with source.open("rb") as file, mmap(file.fileno(), length, access=ACCESS_READ, offset=offset) as mmapped_file:
         mmapped_file.seek(start_byte - offset)
         for line in iter(mmapped_file.readline, b""):
@@ -111,7 +136,7 @@ def process_chunk(source: Path, start_byte: int, end_byte: int) -> dict[bytes, S
     return registry
 
 
-def process_measurements(source: Path, pool_size: int) -> dict[bytes, Stats]:
+def process_measurements(source: Path, pool_size: int) -> Statistics:
     chunks = []
     file_size = source.stat().st_size
     base_chunk_size = file_size // pool_size
@@ -133,9 +158,9 @@ def process_measurements(source: Path, pool_size: int) -> dict[bytes, Stats]:
     return gather(results)
 
 
-def print_statistic(registry: dict[bytes, Stats]) -> None:
+def print_statistic(registry: Statistics) -> None:
     result = ", ".join(
-        f"{station.decode()}={stats.minimum:.1f}/{stats.mean:.1f}/{stats.maximum:.1f}"
+        f"{station}={stats.minimum:.1f}/{stats.mean:.1f}/{stats.maximum:.1f}"
         for station, stats in sorted(registry.items())
     )
     print("{", result, "}", sep="")

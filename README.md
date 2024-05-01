@@ -2,6 +2,10 @@
 
 More details of the challenge at [blog post](https://www.morling.dev/blog/one-billion-row-challenge/)
 
+The main limitation is allowing the use of only built-in functionality.
+
+Note: I allowed myself to use external libs for work with command line arguments.
+
 ---
 
 

@@ -77,11 +77,18 @@ I will try to add grids with progress improvements for each language.
 
 
 ### Rust
-| Time      | Delta      | Notes                                                   |
-|-----------|------------|---------------------------------------------------------|
-| 05:44:451 | 0          | Naive + Buffed I/O                                      |
-| 04:04:033 | +01:40:418 | Remove unnecessary allocations, assignments, and prints |
-| 03:58:401 | +00:05:631 | Build result with String::push_str and then print       |
+#### Windows 11
+| Time      | Delta      | Notes                                                  |
+|-----------|------------|--------------------------------------------------------|
+| 05:44:451 | 0          | Naive + Buffed I/O                                     |
+| 03:21:331 | +02:23:120 | Remove debug prints<br/>Remove unnecessary allocations |
+
+
+#### WSL (Ubuntu 24)
+| Time      | Delta      | Notes                                                  |
+|-----------|------------|--------------------------------------------------------|
+| 02:39:606 | 0          | Naive + Buffed I/O                                     |
+| 02:03:929 | +00:35:676 | Remove debug prints<br/>Remove unnecessary allocations |
 
 ---
 

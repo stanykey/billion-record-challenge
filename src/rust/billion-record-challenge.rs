@@ -58,46 +58,51 @@ fn format_duration(duration: Duration) -> String {
     format!("{:02}:{:02}:{:03}", minutes, seconds, milliseconds)
 }
 
+fn parse_temperature(temperature: &str) -> f64 {
+    temperature.parse::<f64>().unwrap()
+}
+
+fn process_line(line: &str, registry: &mut HashMap<String, Stats>) {
+    let (city, temperature) = line.split_once(";").unwrap();
+
+    let temperature = parse_temperature(&temperature);
+    if !registry.contains_key(city) {
+        registry.insert(
+            city.to_string(),
+            Stats {
+                min: temperature,
+                max: temperature,
+                sum: temperature,
+                count: 1,
+            },
+        );
+    } else {
+        let record = registry.get_mut(city).unwrap();
+        record.min = temperature.min(record.min);
+        record.max = temperature.max(record.max);
+        record.sum += temperature;
+        record.count += 1;
+    }
+}
+
 fn process_measurements(path: &Path) -> HashMap<String, Stats> {
     let file = File::open(path).unwrap();
     let buffer_size = 4096 * 4096;
     let reader = BufReader::with_capacity(buffer_size, file);
 
-    let mut stats: HashMap<String, Stats> = HashMap::new();
+    let mut registry: HashMap<String, Stats> = HashMap::new();
     for line in reader.lines() {
-        let line_content = line.unwrap();
-        let (city, temperature_string) = line_content.split_once(";").unwrap();
-
-        let city = city.to_string();
-        let temperature = temperature_string.parse::<f64>().unwrap();
-        if !stats.contains_key(&city) {
-            stats.insert(city.clone(), Stats::default());
-        }
-        let record = stats.get_mut(&city).unwrap();
-
-        if temperature < record.min {
-            record.min = temperature;
-        }
-
-        if temperature > record.max {
-            record.max = temperature;
-        }
-
-        record.sum += temperature;
-        record.count += 1;
+        process_line(line.unwrap().as_str(), &mut registry);
     }
-
-    return stats;
+    return registry;
 }
 
-fn print_statistic(stats: &HashMap<String, Stats>) {
-    let mut keys: Vec<&String> = stats.keys().collect();
+fn print_statistic(registry: &HashMap<String, Stats>) {
+    let mut keys: Vec<&String> = registry.keys().collect();
     keys.sort_by(|a, b| a.cmp(&b));
 
-    let mut result = String::new();
-    result.push_str("{");
-    for key in keys {
-        let record = stats.get(key).unwrap();
+    let mut result = keys.iter().fold(String::new(), |mut report, key| {
+        let record = registry.get(*key).unwrap();
         let info = format!(
             "{}={}/{:.1}/{}, ",
             key,
@@ -105,11 +110,12 @@ fn print_statistic(stats: &HashMap<String, Stats>) {
             record.mean(),
             record.max
         );
-        result.push_str(&info);
-    }
-    result.push_str("}");
+        report.push_str(&info);
+        report
+    });
+    result.truncate(result.len() - 2);
 
-    println!("{result}");
+    println!("{{{}}}", result);
 }
 
 fn main() {

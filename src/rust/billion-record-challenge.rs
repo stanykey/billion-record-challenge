@@ -1,6 +1,7 @@
 use clap::Parser;
 use std::collections::HashMap;
 use std::fs::File;
+use std::hash::{BuildHasherDefault, Hasher};
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::process;
@@ -53,7 +54,30 @@ impl Stats {
     }
 }
 
-type Registry = HashMap<String, Stats>;
+struct FnvHasher(u64);
+
+impl Default for FnvHasher {
+    fn default() -> FnvHasher {
+        FnvHasher(0xcbf29ce484222325)
+    }
+}
+
+impl Hasher for FnvHasher {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        let FnvHasher(mut hash) = *self;
+        for byte in bytes {
+            hash = hash ^ (*byte as u64);
+            hash = hash * 0x100000001b3;
+        }
+        *self = FnvHasher(hash);
+    }
+}
+
+type Registry = HashMap<String, Stats, BuildHasherDefault<FnvHasher>>;
 
 fn format_duration(duration: Duration) -> String {
     // Calculate minutes, seconds, and milliseconds

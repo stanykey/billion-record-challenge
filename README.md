@@ -83,6 +83,7 @@ I will try to add grids with progress improvements for each language.
 | 05:44:451 | 0          | Naive + Buffed I/O                                         |
 | 03:21:331 | +02:23:120 | Remove debug prints<br/>Remove unnecessary allocations     |
 | 02:54:161 | +00:27:170 | Change temperatures representation, parsing and processing |
+| 02:40:729 | +00:13:432 | Replace default hash algorithm with FNV                    |
 
 
 #### WSL (Ubuntu 24)
@@ -91,6 +92,7 @@ I will try to add grids with progress improvements for each language.
 | 02:39:606 | 0          | Naive + Buffed I/O                                         |
 | 02:03:929 | +00:35:676 | Remove debug prints<br/>Remove unnecessary allocations     |
 | 01:38:455 | +00:25:474 | Change temperatures representation, parsing and processing |
+| 01:26:030 | +00:12:425 | Replace default hash algorithm with FNV                    |
 
 ---
 

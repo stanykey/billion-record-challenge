@@ -84,6 +84,7 @@ I will try to add grids with progress improvements for each language.
 | 03:21:331 | +02:23:120 | Remove debug prints<br/>Remove unnecessary allocations     |
 | 02:54:161 | +00:27:170 | Change temperatures representation, parsing and processing |
 | 02:40:729 | +00:13:432 | Replace default hash algorithm with FNV                    |
+| 01:37:834 | +01:02:895 | Speed up file reading using `BufReader::read_line`         |
 
 
 #### WSL (Ubuntu 24)
@@ -93,6 +94,7 @@ I will try to add grids with progress improvements for each language.
 | 02:03:929 | +00:35:676 | Remove debug prints<br/>Remove unnecessary allocations     |
 | 01:38:455 | +00:25:474 | Change temperatures representation, parsing and processing |
 | 01:26:030 | +00:12:425 | Replace default hash algorithm with FNV                    |
+| 01:11:196 | +00:14:833 | Speed up file reading using `BufReader::read_line`         |
 
 ---
 

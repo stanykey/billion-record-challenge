@@ -5,7 +5,6 @@ use std::hash::{BuildHasherDefault, Hasher};
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::process;
-use std::string::String;
 use std::time::{Duration, Instant};
 
 #[derive(Parser)]
@@ -133,11 +132,13 @@ fn process_line(line: &str, registry: &mut Registry) {
 fn process_measurements(path: &Path) -> Registry {
     let file = File::open(path).unwrap();
     let buffer_size = 4096 * 4096;
-    let reader = BufReader::with_capacity(buffer_size, file);
+    let mut reader = BufReader::with_capacity(buffer_size, file);
 
     let mut registry = Registry::default();
-    for line in reader.lines() {
-        process_line(line.unwrap().as_str(), &mut registry);
+    let mut line = String::new();
+    while reader.read_line(&mut line).unwrap() != 0 {
+        process_line(&line[..line.len() - 1], &mut registry);
+        line.clear();
     }
     return registry;
 }

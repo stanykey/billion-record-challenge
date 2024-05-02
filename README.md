@@ -78,23 +78,26 @@ I will try to add grids with progress improvements for each language.
 
 ### Rust
 #### Windows 11
-| Time      | Delta      | Notes                                                      |
-|-----------|------------|------------------------------------------------------------|
-| 05:44:451 | 0          | Naive + Buffed I/O                                         |
-| 03:21:331 | +02:23:120 | Remove debug prints<br/>Remove unnecessary allocations     |
-| 02:54:161 | +00:27:170 | Change temperatures representation, parsing and processing |
-| 02:40:729 | +00:13:432 | Replace default hash algorithm with FNV                    |
-| 01:37:834 | +01:02:895 | Speed up file reading using `BufReader::read_line`         |
+| Time      | Delta      | Notes                                                            |
+|-----------|------------|------------------------------------------------------------------|
+| 05:44:451 | 0          | Naive + Buffed I/O                                               |
+| 03:21:331 | +02:23:120 | Remove debug prints<br/>Remove unnecessary allocations           |
+| 02:54:161 | +00:27:170 | Change temperatures representation, parsing and processing       |
+| 02:40:729 | +00:13:432 | Replace default hash algorithm with FNV                          |
+| 01:37:834 | +01:02:895 | Speed up file reading using `BufReader::read_line`               |
+| 01:04:801 | +00:33:033 | Read file in binary mode<br/>Turn off utf-8 sequences validation |
 
 
 #### WSL (Ubuntu 24)
-| Time      | Delta      | Notes                                                      |
-|-----------|------------|------------------------------------------------------------|
-| 02:39:606 | 0          | Naive + Buffed I/O                                         |
-| 02:03:929 | +00:35:676 | Remove debug prints<br/>Remove unnecessary allocations     |
-| 01:38:455 | +00:25:474 | Change temperatures representation, parsing and processing |
-| 01:26:030 | +00:12:425 | Replace default hash algorithm with FNV                    |
-| 01:11:196 | +00:14:833 | Speed up file reading using `BufReader::read_line`         |
+| Time      | Delta      | Notes                                                            |
+|-----------|------------|------------------------------------------------------------------|
+| 02:39:606 | 0          | Naive + Buffed I/O                                               |
+| 02:03:929 | +00:35:676 | Remove debug prints<br/>Remove unnecessary allocations           |
+| 01:38:455 | +00:25:474 | Change temperatures representation, parsing and processing       |
+| 01:26:030 | +00:12:425 | Replace default hash algorithm with FNV                          |
+| 01:11:196 | +00:14:833 | Speed up file reading using `BufReader::read_line`               |
+| 00:49:090 | +00:22:106 | Read file in binary mode<br/>Turn off utf-8 sequences validation |
+
 
 ---
 

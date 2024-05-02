@@ -70,7 +70,7 @@ impl Hasher for FnvHasher {
         let FnvHasher(mut hash) = *self;
         for byte in bytes {
             hash = hash ^ (*byte as u64);
-            hash = hash * 0x100000001b3;
+            hash = hash.wrapping_mul(0x100000001b3);
         }
         *self = FnvHasher(hash);
     }
@@ -89,8 +89,7 @@ fn format_duration(duration: Duration) -> String {
     format!("{:02}:{:02}:{:03}", minutes, seconds, milliseconds)
 }
 
-fn parse_temperature(temperature: &str) -> i32 {
-    let bytes = temperature.as_bytes();
+fn parse_temperature(bytes: &[u8]) -> i32 {
     match bytes.len() {
         5 => {
             // b"-99.9"
@@ -114,10 +113,12 @@ fn parse_temperature(temperature: &str) -> i32 {
     }
 }
 
-fn process_line(line: &str, registry: &mut Registry) {
-    let (city, temperature) = line.split_once(";").unwrap();
+unsafe fn process_line(line: &[u8], registry: &mut Registry) {
+    let delimiter = line.iter().position(|&b| b == b';').unwrap();
 
-    let temperature = parse_temperature(&temperature);
+    let city = std::str::from_utf8_unchecked(&line[..delimiter]);
+    let temperature = parse_temperature(&line[delimiter + 1..line.len()]);
+
     if !registry.contains_key(city) {
         registry.insert(city.to_string(), Stats::new(temperature));
     } else {
@@ -129,14 +130,14 @@ fn process_line(line: &str, registry: &mut Registry) {
     }
 }
 
-fn process_measurements(path: &Path) -> Registry {
+unsafe fn process_measurements(path: &Path) -> Registry {
     let file = File::open(path).unwrap();
     let buffer_size = 4096 * 4096;
     let mut reader = BufReader::with_capacity(buffer_size, file);
 
     let mut registry = Registry::default();
-    let mut line = String::new();
-    while reader.read_line(&mut line).unwrap() != 0 {
+    let mut line = Vec::new();
+    while reader.read_until(b'\n', &mut line).unwrap() != 0 {
         process_line(&line[..line.len() - 1], &mut registry);
         line.clear();
     }
@@ -174,7 +175,7 @@ fn main() {
 
     let start_point = Instant::now();
 
-    let stats = process_measurements(path);
+    let stats = unsafe { process_measurements(path) };
     print_statistic(&stats);
 
     println!(

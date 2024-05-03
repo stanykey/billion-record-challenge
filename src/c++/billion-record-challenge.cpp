@@ -39,20 +39,34 @@ struct Stats {
     }
 };
 
-struct StringHasher {
-    using hash_type      = std::hash<std::string_view>;
+class StringHasher {
+public:
+    using hash_type      = std::size_t;
     using is_transparent = void;
 
-    std::size_t operator()(const char* str) const {
-        return hash_type{}(str);
+    static constexpr hash_type FNV_offset_basis = 14695981039346656037ULL;
+    static constexpr hash_type FNV_prime        = 1099511628211ULL;
+
+    hash_type operator()(const char* str) const {
+        return fnv1a_hash(str);
     }
 
-    std::size_t operator()(std::string_view str) const {
-        return hash_type{}(str);
+    hash_type operator()(std::string_view str) const {
+        return fnv1a_hash(str);
     }
 
-    std::size_t operator()(std::string const& str) const {
-        return hash_type{}(str);
+    hash_type operator()(const std::string& str) const {
+        return fnv1a_hash(str);
+    }
+
+private:
+    static hash_type fnv1a_hash(std::string_view str) {
+        hash_type hash = FNV_offset_basis;
+        for (const unsigned char c : str) {
+            hash ^= c;
+            hash *= FNV_prime;
+        }
+        return hash;
     }
 };
 

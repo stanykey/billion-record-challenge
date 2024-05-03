@@ -86,6 +86,7 @@ I will try to add grids with progress improvements for each language.
 | 02:40:729 | +00:13:432 | Replace default hash algorithm with FNV                          |
 | 01:37:834 | +01:02:895 | Speed up file reading using `BufReader::read_line`               |
 | 01:04:801 | +00:33:033 | Read file in binary mode<br/>Turn off utf-8 sequences validation |
+| 00:08:992 | +00:55:808 | Multicore execution (12 CPU)                                     |
 
 
 #### WSL (Ubuntu 24)
@@ -97,7 +98,7 @@ I will try to add grids with progress improvements for each language.
 | 01:26:030 | +00:12:425 | Replace default hash algorithm with FNV                          |
 | 01:11:196 | +00:14:833 | Speed up file reading using `BufReader::read_line`               |
 | 00:49:090 | +00:22:106 | Read file in binary mode<br/>Turn off utf-8 sequences validation |
-
+| 00:06:114 | +00:42:975 | Multicore execution (12 CPU)                                     |
 
 ---
 

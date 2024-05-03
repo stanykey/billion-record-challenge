@@ -98,15 +98,23 @@ I will try to add grids with progress improvements for each language.
 | 01:26:030       | +00:12:425       | Replace default hash algorithm with FNV                          |
 | 01:11:196       | +00:14:833       | Speed up file reading using `BufReader::read_line`               |
 | 00:49:090       | +00:22:106       | Read file in binary mode<br/>Turn off utf-8 sequences validation |
-| **_00:06:114_** | **_+00:42:975_** | **_Multicore execution (12 CPU)_**                               |~~~~
+| **_00:06:114_** | **_+00:42:975_** | **_Multicore execution (12 CPU)_**                               |
 
 ---
 
 
 ### C++
-| Time      | Delta      | Notes                                                   |
-|-----------|------------|---------------------------------------------------------|
-| 05:25:736 | 0          | Naive + Buffed I/O                                      |
-| 05:16:365 | +00:09:371 | Remove unnecessary allocations, assignments, and prints |
+#### Windows 11, msvc
+| Time      | Delta      | Notes                                                                               |
+|-----------|------------|-------------------------------------------------------------------------------------|
+| 05:25:736 | 0          | Naive + Buffed I/O                                                                  |
+| 04:40:763 | +00:44:972 | Remove debug prints<br/>Read file in binary mode<br/>Remove unnecessary allocations |
+
+
+#### WSL (Ubuntu 24), gcc
+| Time      | Delta      | Notes                                                                               |
+|-----------|------------|-------------------------------------------------------------------------------------|
+| 01:19:791 | 0          | Naive + Buffed I/O                                                                  |
+| 01:08:614 | +00:11:176 | Remove debug prints<br/>Read file in binary mode<br/>Remove unnecessary allocations |
 
 ---

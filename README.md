@@ -109,6 +109,7 @@ I will try to add grids with progress improvements for each language.
 |-----------|------------|-------------------------------------------------------------------------------------|
 | 05:25:736 | 0          | Naive + Buffed I/O                                                                  |
 | 04:40:763 | +00:44:972 | Remove debug prints<br/>Read file in binary mode<br/>Remove unnecessary allocations |
+| 03:01:995 | +01:38:768 | Change temperatures representation, parsing and processing                          |
 
 
 #### WSL (Ubuntu 24), gcc
@@ -116,5 +117,6 @@ I will try to add grids with progress improvements for each language.
 |-----------|------------|-------------------------------------------------------------------------------------|
 | 01:19:791 | 0          | Naive + Buffed I/O                                                                  |
 | 01:08:614 | +00:11:176 | Remove debug prints<br/>Read file in binary mode<br/>Remove unnecessary allocations |
+| 00:58:587 | +00:10:026 | Change temperatures representation, parsing and processing                          |
 
 ---

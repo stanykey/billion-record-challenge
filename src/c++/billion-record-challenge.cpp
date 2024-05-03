@@ -10,24 +10,24 @@
 #include <cxxopts.hpp>
 
 struct Stats {
-    double      min   = std::numeric_limits<double>::max();
-    double      max   = std::numeric_limits<double>::min();
-    double      sum   = 0.0;
-    std::size_t count = 0;
+    std::int64_t min   = std::numeric_limits<std::int64_t>::max();
+    std::int64_t max   = std::numeric_limits<std::int64_t>::min();
+    std::int64_t sum   = 0.0;
+    std::size_t  count = 0;
 
     Stats() = default;
-    Stats(double temperature)
+    Stats(std::int64_t temperature)
         : min(temperature)
         , max(temperature)
         , sum(temperature)
         , count(1) {}
 
     [[nodiscard]] double minimum() const {
-        return min;
+        return min * 0.1;
     }
 
     [[nodiscard]] double maximum() const {
-        return max;
+        return max * 0.1;
     }
 
     [[nodiscard]] double mean() const {
@@ -35,7 +35,7 @@ struct Stats {
             return 0.0;
         }
 
-        return sum / static_cast<double>(count);
+        return sum / static_cast<double>(count) * 0.1;
     }
 };
 
@@ -59,10 +59,28 @@ struct StringHasher {
 using Registry = std::unordered_map<std::string, Stats, StringHasher, std::equal_to<>>;
 
 
-[[nodiscard]] double parse_temperature(std::string_view str) {
-    double value = 0.0;
-    std::from_chars(str.data(), str.data() + str.size(), value);
-    return value;
+[[nodiscard]] std::int64_t parse_temperature(std::string_view bytes) {
+    switch (bytes.size()) {
+        case 5: {
+            // "-99.9"
+            return -100 * (bytes[1] - '0') - 10 * (bytes[2] - '0') - (bytes[4] - '0');
+        }
+
+        case 4: {
+            if (bytes[0] == '-') {
+                // "-9.9"
+                return -10 * (bytes[1] - '0') - (bytes[3] - '0');
+            } else {
+                // "99.9"
+                return 100 * (bytes[0] - '0') + 10 * (bytes[1] - '0');
+            }
+        }
+
+        default: {
+            // "9.9"
+            return 10 * (bytes[0] - '0') + (bytes[2] - '0');
+        }
+    }
 }
 
 [[nodiscard]] std::string time_past_since(const std::chrono::system_clock::time_point& start_point) {

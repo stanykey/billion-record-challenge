@@ -105,20 +105,22 @@ I will try to add grids with progress improvements for each language.
 
 ### C++
 #### Windows 11, msvc
-| Time      | Delta      | Notes                                                                               |
-|-----------|------------|-------------------------------------------------------------------------------------|
-| 05:25:736 | 0          | Naive + Buffed I/O                                                                  |
-| 04:40:763 | +00:44:972 | Remove debug prints<br/>Read file in binary mode<br/>Remove unnecessary allocations |
-| 03:01:995 | +01:38:768 | Change temperatures representation, parsing and processing                          |
-| 02:59:092 | +00:02:903 | Replace default hash algorithm with FNV                                             |
+| Time            | Delta            | Notes                                                                               |
+|-----------------|------------------|-------------------------------------------------------------------------------------|
+| 05:25:736       | 0                | Naive + Buffed I/O                                                                  |
+| 04:40:763       | +00:44:972       | Remove debug prints<br/>Read file in binary mode<br/>Remove unnecessary allocations |
+| 03:01:995       | +01:38:768       | Change temperatures representation, parsing and processing                          |
+| 02:59:092       | +00:02:903       | Replace default hash algorithm with FNV                                             |
+| **_01:59:059_** | **_+01:00:033_** | **_Multicore execution (12 CPU)_**                                                  |
 
 
 #### WSL (Ubuntu 24), gcc
-| Time      | Delta      | Notes                                                                               |
-|-----------|------------|-------------------------------------------------------------------------------------|
-| 01:19:791 | 0          | Naive + Buffed I/O                                                                  |
-| 01:08:614 | +00:11:176 | Remove debug prints<br/>Read file in binary mode<br/>Remove unnecessary allocations |
-| 00:58:587 | +00:10:026 | Change temperatures representation, parsing and processing                          |
-| 00:54:685 | +00:03:902 | Replace default hash algorithm with FNV                                             |
+| Time            | Delta            | Notes                                                                               |
+|-----------------|------------------|-------------------------------------------------------------------------------------|
+| 01:19:791       | 0                | Naive + Buffed I/O                                                                  |
+| 01:08:614       | +00:11:176       | Remove debug prints<br/>Read file in binary mode<br/>Remove unnecessary allocations |
+| 00:58:587       | +00:10:026       | Change temperatures representation, parsing and processing                          |
+| 00:54:685       | +00:03:902       | Replace default hash algorithm with FNV                                             |
+| **_00:06:859_** | **_+00:47:826_** | **_Multicore execution (12 CPU)_**                                                  |
 
 ---
